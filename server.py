@@ -17,6 +17,10 @@ cities = {
     'париж': ["1030494/4e0d0c907ef04b843043", '1652229/a4d317b133547eb8ff4c']
 }
 
+HELP_TEXT = 'Я показываю тебе картинки городов, а тебе нужно ответить, ' \
+            'что это за город, если ты не сможешь с первого раза, то ' \
+            'у тебя есть ещё и вторая попытка.'
+
 sessionStorage = {}
 
 
@@ -39,6 +43,13 @@ def handle_dialog(res, req):
     user_id = req['session']['user_id']
     if req['session']['new']:
         res['response']['text'] = 'Привет! Назови своё имя!'
+        res['response']['buttons'] = [
+            {
+                'title': 'Помощь',
+                'hide': True
+            }
+        ]
+
         sessionStorage[user_id] = {
             'first_name': None,  # здесь будет храниться имя
             'game_started': False
@@ -52,6 +63,20 @@ def handle_dialog(res, req):
         if first_name is None:
             res['response'][
                 'text'] = 'Не расслышала имя. Повтори, пожалуйста!'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
+        elif first_name == 'help':
+            res['response']['text'] = HELP_TEXT + ' А теперь назови своё имя'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
         else:
             sessionStorage[user_id]['first_name'] = first_name
             # создаём пустой массив, в который будем записывать города,
@@ -74,7 +99,7 @@ def handle_dialog(res, req):
                 },
                 {
                     'title': 'Помощь',
-                    'hide': False
+                    'hide': True
                 }
             ]
     else:
@@ -106,12 +131,22 @@ def handle_dialog(res, req):
                 res['response']['text'] = 'Ну и ладно!'
                 res['end_session'] = True
             elif req['request']['original_utterance'].lower() == 'помощь':
-                res['response']['text'] = 'Я показываю тебе картинки ' \
-                                          'городов, а тебе нужно ответить, ' \
-                                          'что это за город, если ты не ' \
-                                          'сможешь с первого раза, ' \
-                                          'то у тебя есть ещё и вторая ' \
-                                          'попытка'
+                res['response']['text'] = HELP_TEXT + ' А теперь скажи, ' \
+                                                      'да или нет '
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Да',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Нет',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Помощь',
+                        'hide': True
+                    }
+                ]
             else:
                 res['response']['text'] = 'Не поняла ответа! Так да или нет?'
                 res['response']['buttons'] = [
@@ -125,7 +160,7 @@ def handle_dialog(res, req):
                     },
                     {
                         'title': 'Помощь',
-                        'hide': False
+                        'hide': True
                     }
                 ]
         else:
@@ -150,6 +185,12 @@ def play_game(res, req):
         res['response']['card']['title'] = 'Что это за город?'
         res['response']['card']['image_id'] = cities[city][attempt - 1]
         res['response']['text'] = 'Тогда сыграем!'
+        res['response']['buttons'] = [
+            {
+                'title': 'Помощь',
+                'hide': True
+            }
+        ]
     else:
         # сюда попадаем, если попытка отгадать не первая
         city = sessionStorage[user_id]['city']
@@ -160,6 +201,12 @@ def play_game(res, req):
             # отправляем пользователя на второй круг. Обратите внимание
             # на этот шаг на схеме.
             res['response']['text'] = 'Правильно! Сыграем ещё?'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
             sessionStorage[user_id]['guessed_cities'].append(city)
             sessionStorage[user_id]['game_started'] = False
             return
@@ -173,6 +220,20 @@ def play_game(res, req):
                 # Обратите внимание на этот шаг на схеме.
                 res['response'][
                     'text'] = f'Вы пытались. Это {city.title()}. Сыграем ещё?'
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Да',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Нет',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Помощь',
+                        'hide': True
+                    }
+                ]
                 sessionStorage[user_id]['game_started'] = False
                 sessionStorage[user_id]['guessed_cities'].append(city)
                 return
@@ -185,6 +246,12 @@ def play_game(res, req):
                 res['response']['card']['image_id'] = cities[city][
                     attempt - 1]
                 res['response']['text'] = 'А вот и не угадал!'
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Помощь',
+                        'hide': True
+                    }
+                ]
     # увеличиваем номер попытки доля следующего шага
     sessionStorage[user_id]['attempt'] += 1
 
@@ -200,6 +267,8 @@ def get_city(req):
 
 
 def get_first_name(req):
+    if 'помощь' in req['request']['nlu']['tokens']:
+        return 'help'
     # перебираем сущности
     for entity in req['request']['nlu']['entities']:
         # находим сущность с типом 'YANDEX.FIO'
