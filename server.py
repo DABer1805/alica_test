@@ -194,8 +194,18 @@ def play_game(res, req):
     else:
         # сюда попадаем, если попытка отгадать не первая
         city = sessionStorage[user_id]['city']
+        if get_city(req) == 'help':
+            res['response']['text'] = HELP_TEXT + ' А теперь назови мне ' \
+                                                  'город на картинке'
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
+            return
         # проверяем есть ли правильный ответ в сообщение
-        if get_city(req) == city:
+        elif get_city(req) == city:
             # если да, то добавляем город к
             # sessionStorage[user_id]['guessed_cities'] и
             # отправляем пользователя на второй круг. Обратите внимание
@@ -257,6 +267,8 @@ def play_game(res, req):
 
 
 def get_city(req):
+    if 'помощь' in req['request']['nlu']['tokens']:
+        return 'help'
     # перебираем именованные сущности
     for entity in req['request']['nlu']['entities']:
         # если тип YANDEX.GEO, то пытаемся получить город(city), если нет,
