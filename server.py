@@ -213,6 +213,15 @@ def play_game(res, req):
             res['response']['text'] = 'Правильно! Сыграем ещё?'
             res['response']['buttons'] = [
                 {
+                    'title': 'Да',
+                    'hide': True
+                },
+                {
+                    'title': 'Нет',
+                    'hide': True
+                },
+                {
+
                     'title': 'Помощь',
                     'hide': True
                 }
