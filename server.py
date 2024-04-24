@@ -4,6 +4,9 @@ import json
 # импортируем функции из нашего второго файла geo
 from geo import get_country, get_distance, get_coordinates
 
+# https://disk.yandex.ru/i/j9CbVt-yVl07Rg - демонстрация навыка в яндекс
+# диалогах
+
 app = Flask(__name__)
 
 # Добавляем логирование в файл.
