@@ -147,7 +147,7 @@ def handle_dialog(res, req):
                     }
                 ]
             else:
-                res['response']['text'] = 'Так сыграем ещё?'
+                res['response']['text'] = 'Сыграем ещё?'
                 res['response']['buttons'] = [
                     {
                         'title': 'Да',
