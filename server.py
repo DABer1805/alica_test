@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify
 import logging
 import json
 from translate import Translator
-# импортируем функции из нашего второго файла geo
-from geo import get_country, get_distance, get_coordinates
 
 app = Flask(__name__)
 
