@@ -51,6 +51,16 @@ def handle_dialog(res, req):
 
     if sessionStorage[user_id]['first_name'] is None:
         first_name = get_first_name(req)
+        if first_name == '/help':
+            res['response'][
+                'text'] = 'Я могу помочь тебе перевести интересующее ' \
+                          'слово на английский, но сначала назови своё имя '
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
         if first_name is None:
             res['response'][
                 'text'] = 'Не расслышала имя. Повтори, пожалуйста!'
@@ -107,6 +117,8 @@ def handle_dialog(res, req):
 
 
 def get_first_name(req):
+    if 'помощь' in req['request']['nlu']['tokens']:
+        return '/help'
     # перебираем сущности
     for entity in req['request']['nlu']['entities']:
         # находим сущность с типом 'YANDEX.FIO'
