@@ -61,7 +61,7 @@ def handle_dialog(res, req):
                     'hide': True
                 }
             ]
-        if first_name is None:
+        elif first_name is None:
             res['response'][
                 'text'] = 'Не расслышала имя. Повтори, пожалуйста!'
             res['response']['buttons'] = [
@@ -74,8 +74,8 @@ def handle_dialog(res, req):
             sessionStorage[user_id]['first_name'] = first_name
             res['response']['text'] = f'Приятно познакомиться, ' \
                                       f'{first_name.title()}. Я Алиса. ' \
-                                      f'Я могу показать город или ' \
-                                      f'сказать расстояние между городами!'
+                                      f'Я могу помочь тебе перевести ' \
+                                      f'интересующее слово на английский'
             res['response']['buttons'] = [
                 {
                     'title': 'Помощь',
